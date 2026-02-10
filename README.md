@@ -150,9 +150,9 @@ A sample file (`sample_equipment_data.csv`) is included for testing.
 
 ## Contact
 
-**Developer**: [Your Name]
+**Developer**: Nrishan Jyoti Das
 
-**Email**: [your.email@example.com]
+**Email**: nrishan@proton.me
 
 ---
 

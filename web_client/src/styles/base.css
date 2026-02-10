@@ -1,0 +1,294 @@
+/* Light theme (default) */
+:root {
+  --bg: #ffffff;
+  --bg-alt: #f4f5f7;
+  --card-bg: #ffffff;
+  --text: #222;
+  --text-muted: #666;
+  --border: #e0e0e0;
+  --accent: #3b6cb4;
+  --accent-hover: #2f5a9a;
+}
+
+/* Dark theme */
+.dark {
+  --bg: #1e1e2f;
+  --bg-alt: #28293d;
+  --card-bg: #2c2c44;
+  --text: #e0e0e0;
+  --text-muted: #999;
+  --border: #3a3a55;
+  --accent: #5a9cf5;
+  --accent-hover: #79b0ff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.header h1 {
+  font-size: 1.2rem;
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Buttons */
+.btn {
+  padding: 7px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn:hover {
+  background: var(--accent-hover);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-small {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.btn-outline:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Layout */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Card */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card h2 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  color: var(--accent);
+}
+
+/* Grid */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Form */
+.form-box {
+  max-width: 340px;
+  margin: 50px auto;
+}
+
+.field {
+  margin-bottom: 10px;
+}
+
+.field label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.field input {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-alt);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+/* Upload */
+.upload-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.upload-row input[type="file"] {
+  font-size: 0.85rem;
+}
+
+.status-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+  background: var(--bg-alt);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.stat-val {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Table */
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.data-table th {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.data-table tr:nth-child(even) {
+  background: var(--bg-alt);
+}
+
+/* Charts */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 600px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-box {
+  background: var(--bg-alt);
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.chart-box h3 {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+/* History */
+.history-list {
+  list-style: none;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+/* Misc */
+.error-text {
+  color: #d44;
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0;
+}
+
+.link-btn:hover {
+  color: var(--accent-hover);
+}
+
+.mt {
+  margin-top: 14px;
+}

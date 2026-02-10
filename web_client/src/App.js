@@ -6,7 +6,8 @@ import EquipmentTable from './components/EquipmentTable';
 import ChartsPanel from './components/ChartsPanel';
 import HistoryPanel from './components/HistoryPanel';
 
-const API = 'http://localhost:8000/api';
+const API = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+
 
 function App() {
     const [token, setToken] = useState(localStorage.getItem('auth_token') || '');
@@ -19,19 +20,18 @@ function App() {
     const [dataset, setDataset] = useState(null);
     const [chartData, setChartData] = useState(null);
     const [history, setHistory] = useState([]);
+    const [showPassword, setShowPassword] = useState(false);
 
-    // Toggle dark class on body
     useEffect(() => {
         document.body.classList.toggle('dark', dark);
         localStorage.setItem('dark_mode', dark);
     }, [dark]);
 
-    // Load history when token changes
     useEffect(() => { if (token) loadHistory(); }, [token]);
 
     const headers = () => ({ headers: { Authorization: `Token ${token}` } });
 
-    // Login with existing account
+    // Authenticates user and gets token
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
@@ -42,7 +42,7 @@ function App() {
         } catch { setError('Invalid credentials.'); }
     };
 
-    // Register new account
+    // Creates new user account
     const handleRegister = async (e) => {
         e.preventDefault();
         setError('');
@@ -61,24 +61,37 @@ function App() {
         setHistory([]);
     };
 
+    // Fetches list of past uploads
     const loadHistory = async () => {
         try { const r = await axios.get(`${API}/history/`, headers()); setHistory(r.data); }
-        catch { /* ignore */ }
+        catch { }
     };
 
-    // Load chart data for a dataset
+    // Loads chart data for selected dataset
     const loadCharts = async (id) => {
         try { const r = await axios.get(`${API}/chart-data/?id=${id}`, headers()); setChartData(r.data); }
-        catch { /* ignore */ }
+        catch { }
     };
 
-    // After upload succeeds
     const onUpload = async (ds) => { setDataset(ds); await loadCharts(ds.id); await loadHistory(); };
-
-    // Select from history
     const onSelect = async (ds) => { setDataset(ds); await loadCharts(ds.id); };
 
-    // Download PDF
+    // Removes dataset permanently
+    const deleteDataset = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this dataset?')) return;
+        try {
+            await axios.delete(`${API}/delete/${id}/`, headers());
+            if (dataset && dataset.id === id) {
+                setDataset(null);
+                setChartData(null);
+            }
+            await loadHistory();
+        } catch (err) {
+            alert('Failed to delete dataset');
+        }
+    };
+
+    // Generates and downloads PDF report
     const downloadPdf = async () => {
         if (!dataset) return;
         try {
@@ -87,17 +100,16 @@ function App() {
             a.href = URL.createObjectURL(new Blob([r.data]));
             a.download = `report_${dataset.id}.pdf`;
             a.click();
-        } catch { /* ignore */ }
+        } catch { }
     };
 
-    // Auth screen
     if (!token) {
         return (
             <div>
                 <header className="header">
                     <h1>CSV Visualizer</h1>
                     <button className="btn btn-small btn-outline" onClick={() => setDark(!dark)}>
-                        {dark ? 'Light Mode' : 'Dark Mode'}
+                        {dark ? 'Light' : 'Dark'}
                     </button>
                 </header>
                 <div className="container">
@@ -116,7 +128,33 @@ function App() {
                             )}
                             <div className="field">
                                 <label>Password</label>
-                                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={e => setPassword(e.target.value)}
+                                        required
+                                        style={{ paddingRight: '2.5rem' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '0.5rem',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            background: 'none',
+                                            border: 'none',
+                                            color: 'var(--muted)',
+                                            cursor: 'pointer',
+                                            padding: '0.25rem',
+                                            fontSize: '0.875rem'
+                                        }}
+                                    >
+                                        {showPassword ? '👁️' : '👁️‍🗨️'}
+                                    </button>
+                                </div>
                             </div>
                             {error && <p className="error-text">{error}</p>}
                             <button className="btn" type="submit">{authMode === 'login' ? 'Login' : 'Register'}</button>
@@ -133,41 +171,47 @@ function App() {
         );
     }
 
-    // Dashboard
     return (
         <div>
             <header className="header">
                 <h1>CSV Visualizer</h1>
                 <div className="header-right">
                     <button className="btn btn-small btn-outline" onClick={() => setDark(!dark)}>
-                        {dark ? 'Light Mode' : 'Dark Mode'}
+                        {dark ? 'Light' : 'Dark'}
                     </button>
                     <button className="btn btn-small" onClick={logout}>Logout</button>
                 </div>
             </header>
-            <div className="container">
-                <UploadCard token={token} api={API} onSuccess={onUpload} />
-
-                {dataset && (
-                    <>
-                        <div className="grid-2">
-                            <SummaryPanel summary={dataset.summary} />
-                            <div className="card">
-                                <h2>Actions</h2>
-                                <button className="btn" onClick={downloadPdf}>Download PDF Report</button>
+            <div className="dashboard">
+                <aside className="sidebar">
+                    <HistoryPanel history={history} onSelect={onSelect} onDelete={deleteDataset} selectedId={dataset?.id} />
+                </aside>
+                <main className="main-content">
+                    <div className="actions-bar">
+                        <UploadCard token={token} api={API} onSuccess={onUpload} />
+                        {dataset && (
+                            <div className="action-buttons">
+                                <button className="btn" onClick={downloadPdf}>📄 Download PDF</button>
                             </div>
-                        </div>
-                        {chartData && (
-                            <>
-                                <EquipmentTable rows={chartData.rows} />
-                                <ChartsPanel chartData={chartData} />
-                            </>
                         )}
-                    </>
-                )}
+                    </div>
 
-                <HistoryPanel history={history} onSelect={onSelect} />
+                    {dataset && (
+                        <>
+                            <SummaryPanel summary={dataset.summary} />
+                            {chartData && (
+                                <>
+                                    <ChartsPanel chartData={chartData} />
+                                    <EquipmentTable rows={chartData.rows} />
+                                </>
+                            )}
+                        </>
+                    )}
+                </main>
             </div>
+            <footer style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)', fontSize: '0.875rem' }}>
+                © {new Date().getFullYear()} FOSSEE CSV Analyzer
+            </footer>
         </div>
     );
 }

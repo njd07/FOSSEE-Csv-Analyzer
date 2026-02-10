@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-// File upload card
 function UploadCard({ token, api, onSuccess }) {
     const [file, setFile] = useState(null);
     const [busy, setBusy] = useState(false);

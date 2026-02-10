@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWidgetItem
 
-# equipment data table
 class TableView(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -12,7 +11,6 @@ class TableView(QWidget):
         layout.addWidget(self.table)
         self.setLayout(layout)
 
-    # fill table from list of dicts
     def load_rows(self, rows):
         if not rows:
             self.table.setRowCount(0)

@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMessageBox
 import requests
 
-# login dialog, returns auth token
 class AuthDialog(QDialog):
     def __init__(self, api_base, parent=None):
         super().__init__(parent)
@@ -31,7 +30,7 @@ class AuthDialog(QDialog):
         u = self.user_input.text().strip()
         p = self.pass_input.text().strip()
         if not u or not p:
-            QMessageBox.warning(self, "Error", "Fill both fields.")
+            QMessageBox.warning(self, "Error", "Fill both fields")
             return
         try:
             r = requests.post(f"{self.api_base}/auth/token/", json={"username": u, "password": p}, timeout=10)
@@ -39,6 +38,6 @@ class AuthDialog(QDialog):
                 self.token = r.json().get("token")
                 self.accept()
             else:
-                QMessageBox.warning(self, "Failed", "Bad credentials.")
+                QMessageBox.warning(self, "Failed", "Bad credentials")
         except requests.RequestException as e:
             QMessageBox.critical(self, "Error", str(e))

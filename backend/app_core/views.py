@@ -37,6 +37,7 @@ class RegisterView(APIView):
 class UploadView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Handles CSV upload, parses it, and creates dataset
     def post(self, request):
         f = request.FILES.get('file')
         if not f:
@@ -79,6 +80,7 @@ class SummaryView(APIView):
 class ChartDataView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Returns data formatted for Chart.js and tables
     def get(self, request):
         did = request.query_params.get('id')
         if not did:
@@ -108,6 +110,7 @@ class ChartDataView(APIView):
 class ReportView(APIView):
     permission_classes = [IsAuthenticated]
 
+    # Generates a PDF report using ReportLab
     def get(self, request):
         did = request.query_params.get('id')
         if not did:
@@ -159,3 +162,15 @@ class ReportView(APIView):
         resp = HttpResponse(buf, content_type='application/pdf')
         resp['Content-Disposition'] = f'attachment; filename="report_{ds.id}.pdf"'
         return resp
+
+class DeleteDatasetView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # Permanently deletes a dataset
+    def delete(self, request, pk):
+        try:
+            ds = UploadedDataset.objects.get(id=pk)
+            ds.delete()
+            return Response({'message': 'Dataset deleted'}, status=200)
+        except UploadedDataset.DoesNotExist:
+            return Response({'error': 'Not found'}, status=404)

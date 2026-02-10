@@ -1,124 +1,81 @@
 # CSV Visualizer
 
-A hybrid **Web + Desktop** application for uploading, analyzing, and visualizing equipment data from CSV files.
+Upload and analyze equipment data from CSV files. Built as both a web app and a desktop client.
 
-## Features
+## What it does
 
-- **CSV Upload**: Upload equipment data via file picker (Web) or file dialog (Desktop)
-- **Data Analysis**: Automatic calculation of averages and type distribution
-- **Interactive Charts**: Bar charts, radar charts for equipment parameters
-- **PDF Reports**: Generate downloadable PDF reports with complete analysis
-- **History Management**: Stores last 5 uploaded datasets per user
-- **Authentication**: Secure user registration and login
-- **Dark Mode**: Toggle between light and dark themes (Web)
+This tool lets you upload CSV files with equipment data and automatically generates charts and statistics. You get both a web interface (React) and a desktop app (PyQt5) that connect to the same Django backend.
 
-## Tech Stack
+Main features:
+- Upload CSV files and see instant analysis
+- Auto-calculated averages for flowrate, pressure, temperature
+- **NEW**: Modern Doughnut and Line charts
+- Download PDF reports with all your data
+- Keeps history of your last 5 uploads (auto-cleanup)
+- **NEW**: Delete datasets directly from UI
+- Dark mode support in the web version
+- Modern Desktop Client with dark theme
 
-| Layer | Technology |
-|-------|------------|
-| Backend | Django + Django REST Framework |
-| Web Frontend | React.js + Chart.js |
-| Desktop Frontend | PyQt5 + Matplotlib |
-| Database | SQLite |
-| Data Processing | Pandas |
-| PDF Generation | ReportLab |
+## Tech used
 
-## Project Structure
+**Backend**: Django + DRF  
+**Web**: React + Chart.js  
+**Desktop**: PyQt5 + Matplotlib  
+**Database**: SQLite  
+**Misc**: Pandas for data processing, ReportLab for PDFs
 
-```
-FOSSEE-Csv-Analyzer/
-├── backend/                 # Django REST API
-│   ├── visualizer_api/     # Django settings, urls, wsgi
-│   ├── app_core/           # Main app (models, views, utils)
-│   ├── requirements.txt
-│   └── Procfile
-├── web_client/             # React application
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   └── styles/        # CSS styles
-│   └── package.json
-├── desktop_client/         # PyQt5 application
-│   ├── app.py             # Entry point
-│   └── components/        # UI components
-├── sample_equipment_data.csv
-└── README.md
-```
+## Setup
 
-## How to Run Locally
+You'll need Python 3.9+ and Node.js 18+.
 
-### Prerequisites
-
-- Python 3.9+
-- Node.js 18+
-- pip
-- npm
-
-### 1. Backend Setup
+### Backend
 
 ```bash
 cd backend
-
-# Create virtual environment (optional but recommended)
 python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or: venv\Scripts\activate  # Windows
+source venv/bin/activate  # on Windows: venv\Scripts\activate
 
-# Install dependencies
 pip install -r requirements.txt
-
-# Run migrations
 python manage.py migrate
-
-# Create superuser (optional, for admin access)
-python manage.py createsuperuser
-
-# Start the server
+python manage.py createsuperuser  # optional, for admin panel
 python manage.py runserver
 ```
 
-The API will be available at `http://127.0.0.1:8000/api/`
+Server runs on `http://localhost:8000`
 
-### 2. Web Frontend Setup
+### Web Client
 
 ```bash
 cd web_client
-
-# Install dependencies
 npm install
-
-# Start development server
 npm start
 ```
 
-The web app will be available at `http://localhost:3000`
+Opens at `http://localhost:3000`
 
-### 3. Desktop Frontend Setup
+### Desktop Client
 
 ```bash
 cd desktop_client
-
-# Install dependencies
 pip install PyQt5 matplotlib requests
-
-# Run the application
 python app.py
 ```
 
-## API Endpoints
+## API Reference
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/register/` | POST | User registration |
-| `/api/auth/token/` | POST | User login (get token) |
-| `/api/upload/` | POST | Upload CSV file |
-| `/api/history/` | GET | List datasets (last 5) |
-| `/api/summary/?id=` | GET | Get summary statistics |
-| `/api/chart-data/?id=` | GET | Get chart-ready data |
-| `/api/report/?id=` | GET | Download PDF report |
+| Endpoint | What it does |
+|----------|-------------|
+| `POST /api/auth/register/` | Create new account |
+| `POST /api/auth/token/` | Login and get token |
+| `POST /api/upload/` | Upload CSV file |
+| `GET /api/history/` | Get last 5 uploads |
+| `GET /api/summary/?id=` | Get stats for a dataset |
+| `GET /api/chart-data/?id=` | Get chart data + table rows |
+| `GET /api/report/?id=` | Download PDF report |
 
 ## CSV Format
 
-The CSV file must include these columns:
+Your CSV should have these columns:
 
 ```csv
 Equipment Name,Type,Flowrate,Pressure,Temperature
@@ -126,7 +83,34 @@ Pump-001,Pump,150.5,25.3,45.2
 Reactor-001,Reactor,0,15.8,180.5
 ```
 
-A sample file (`sample_equipment_data.csv`) is included for testing.
+There's a sample file included (`sample_equipment_data.csv`) you can use for testing.
+
+## Project Structure
+
+```
+csv_visualizer/
+├── backend/
+│   ├── app_core/         # models, views, etc
+│   ├── visualizer_api/   # settings
+│   └── requirements.txt
+├── web_client/
+│   ├── src/
+│   │   ├── components/
+│   │   └── styles/
+│   └── package.json
+├── desktop_client/
+│   ├── app.py
+│   └── components/
+└── sample_equipment_data.csv
+```
+
+## Notes
+
+- The web app has dark mode (toggle in header)
+- Desktop app is dark by default
+- History only keeps last 5 datasets per cleanup
+- PDF reports include all tables and stats
+- Admin panel available at `/admin/` if you created a superuser
 
 ## Screenshots
 
@@ -134,11 +118,9 @@ A sample file (`sample_equipment_data.csv`) is included for testing.
 
 ![Login Page](./screenshots/login.png)
 
-![Register Page](./screenshots/register.png)
+![Dashboard](./screenshots/dashboard.png)
 
-![Dashboard View](./screenshots/dashboard.png)
-
-![Charts and Analytics](./screenshots/charts.png)
+![Charts](./screenshots/charts.png)
 
 ### Desktop Application
 
@@ -150,9 +132,8 @@ A sample file (`sample_equipment_data.csv`) is included for testing.
 
 ## Contact
 
-**Developer**: Nrishan Jyoti Das
-
-**Email**: nrishan@proton.me
+Built by Nrishan Jyoti Das  
+Email: nrishan@proton.me
 
 ---
 

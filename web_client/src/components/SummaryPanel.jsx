@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Shows key stats: row count + averages
 function SummaryPanel({ summary }) {
     if (!summary) return null;
     const { total_count, averages, type_distribution } = summary;

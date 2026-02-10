@@ -5,6 +5,7 @@ db.sqlite3
 media/
 staticfiles/
 .env
+.env.local
 *.egg-info/
 node_modules/
 web_client/build/

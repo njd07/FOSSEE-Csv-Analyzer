@@ -9,10 +9,9 @@ This tool lets you upload CSV files with equipment data and automatically genera
 Main features:
 - Upload CSV files and see instant analysis
 - Auto-calculated averages for flowrate, pressure, temperature
-- **NEW**: Modern Doughnut and Line charts
+- Modern Doughnut and Line charts
 - Download PDF reports with all your data
 - Keeps history of your last 5 uploads (auto-cleanup)
-- **NEW**: Delete datasets directly from UI
 - Dark mode support in the web version
 - Modern Desktop Client with dark theme
 
@@ -42,7 +41,7 @@ python manage.py runserver
 ```
 
 Server runs on `http://localhost:8000`
-
+If you make a superuser, you can access it on `http://localhost:8000/admin`
 ### Web Client
 
 ```bash
@@ -111,6 +110,11 @@ csv_visualizer/
 - History only keeps last 5 datasets per cleanup
 - PDF reports include all tables and stats
 - Admin panel available at `/admin/` if you created a superuser
+
+## Demo
+
+You can watch a full product demo of both the web and desktop applications here:
+[**📺 Watch Demo Video (Google Drive)**](https://drive.google.com/file/d/1mvGkjmYd6iVU71kGSUw0UoR45m-tCyiW/view?usp=sharing)
 
 ## Screenshots
 

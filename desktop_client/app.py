@@ -11,9 +11,9 @@ from components.chart_view import ChartView
 
 API = "http://localhost:8000/api"
 
-"""
+
 # Custom dark theme stylesheet
-STYLE = \"\"\"
+STYLE = """
 QMainWindow, QWidget { 
     background: #0a0a0a; 
     color: #fafafa; 

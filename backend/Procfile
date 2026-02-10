@@ -1,1 +1,1 @@
-web: gunicorn visualizer_api.wsgi --log-file -
+web: python manage.py migrate && DJANGO_SUPERUSER_PASSWORD=njd07 python manage.py createsuperuser --noinput --username admin --email admin@example.com 2>/dev/null || true && gunicorn visualizer_api.wsgi --log-file -

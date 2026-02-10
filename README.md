@@ -1,52 +1,67 @@
-# CSV Visualizer — Chemical Equipment Parameter Visualizer
+# CSV Visualizer
 
-A hybrid web + desktop application for uploading chemical equipment CSV data, viewing summaries, visualizing charts, and generating PDF reports.
+A hybrid **Web + Desktop** application for uploading, analyzing, and visualizing equipment data from CSV files.
+
+## Features
+
+- **CSV Upload**: Upload equipment data via file picker (Web) or file dialog (Desktop)
+- **Data Analysis**: Automatic calculation of averages and type distribution
+- **Interactive Charts**: Bar charts, radar charts for equipment parameters
+- **PDF Reports**: Generate downloadable PDF reports with complete analysis
+- **History Management**: Stores last 5 uploaded datasets per user
+- **Authentication**: Secure user registration and login
+- **Dark Mode**: Toggle between light and dark themes (Web)
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Backend | Python Django + Django REST Framework |
-| Database | SQLite |
-| CSV Handling | pandas |
+|-------|------------|
+| Backend | Django + Django REST Framework |
 | Web Frontend | React.js + Chart.js |
 | Desktop Frontend | PyQt5 + Matplotlib |
+| Database | SQLite |
+| Data Processing | Pandas |
 | PDF Generation | ReportLab |
-| Deployment | Railway (backend) |
 
 ## Project Structure
 
 ```
-csv_visualizer/
-├── backend/               # Django REST API
-│   ├── manage.py
+FOSSEE-Csv-Analyzer/
+├── backend/                 # Django REST API
+│   ├── visualizer_api/     # Django settings, urls, wsgi
+│   ├── app_core/           # Main app (models, views, utils)
 │   ├── requirements.txt
-│   ├── Procfile
-│   ├── visualizer_api/    # Django project settings
-│   └── app_core/          # Main app: models, views, utils
-├── web_client/            # React frontend
-│   ├── package.json
-│   └── src/
-│       ├── App.js
-│       ├── components/    # UploadCard, SummaryPanel, etc.
-│       └── styles/
-├── desktop_client/        # PyQt5 desktop app
-│   ├── app.py
-│   └── components/
+│   └── Procfile
+├── web_client/             # React application
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   └── styles/        # CSS styles
+│   └── package.json
+├── desktop_client/         # PyQt5 application
+│   ├── app.py             # Entry point
+│   └── components/        # UI components
 ├── sample_equipment_data.csv
 └── README.md
 ```
 
-## Setup Instructions
+## How to Run Locally
 
-### 1. Backend
+### Prerequisites
+
+- Python 3.9+
+- Node.js 18+
+- pip
+- npm
+
+### 1. Backend Setup
 
 ```bash
 cd backend
 
-# Create a virtual environment (recommended)
+# Create virtual environment (optional but recommended)
 python -m venv venv
-source venv/bin/activate   # On Windows: venv\Scripts\activate
+source venv/bin/activate  # Linux/Mac
+# or: venv\Scripts\activate  # Windows
 
 # Install dependencies
 pip install -r requirements.txt
@@ -54,138 +69,91 @@ pip install -r requirements.txt
 # Run migrations
 python manage.py migrate
 
-# Create a superuser (for authentication)
+# Create superuser (optional, for admin access)
 python manage.py createsuperuser
 
-# Start the development server
+# Start the server
 python manage.py runserver
 ```
 
-The API will be available at `http://localhost:8000/api/`.
+The API will be available at `http://127.0.0.1:8000/api/`
 
-### 2. Web Frontend
+### 2. Web Frontend Setup
 
 ```bash
 cd web_client
 
-# Install Node dependencies
+# Install dependencies
 npm install
 
-# Start the React dev server
+# Start development server
 npm start
 ```
 
-The web app will open at `http://localhost:3000`. Log in with the superuser credentials you created.
+The web app will be available at `http://localhost:3000`
 
-### 3. Desktop Client
+### 3. Desktop Frontend Setup
 
 ```bash
 cd desktop_client
 
-# Install Python dependencies (if not already in venv)
+# Install dependencies
 pip install PyQt5 matplotlib requests
 
-# Run the desktop app
+# Run the application
 python app.py
 ```
 
-A login dialog will appear — enter your Django superuser credentials and the app will connect to `http://localhost:8000/api/`.
-
 ## API Endpoints
 
-All endpoints require authentication (Token or Basic). Obtain a token via:
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/register/` | POST | User registration |
+| `/api/auth/token/` | POST | User login (get token) |
+| `/api/upload/` | POST | Upload CSV file |
+| `/api/history/` | GET | List datasets (last 5) |
+| `/api/summary/?id=` | GET | Get summary statistics |
+| `/api/chart-data/?id=` | GET | Get chart-ready data |
+| `/api/report/?id=` | GET | Download PDF report |
 
-```bash
-curl -X POST http://localhost:8000/api/auth/token/ \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "yourpassword"}'
-```
+## CSV Format
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/upload/` | Upload a CSV file (multipart, field: `file`) |
-| GET | `/api/history/` | List last 5 uploaded datasets |
-| GET | `/api/summary/?id=<id>` | Get summary JSON for a dataset |
-| GET | `/api/chart-data/?id=<id>` | Get chart-ready data (labels, counts, averages, rows) |
-| GET | `/api/report/?id=<id>` | Download a PDF report |
-| POST | `/api/auth/token/` | Get auth token |
+The CSV file must include these columns:
 
-### Example: Upload via curl
-
-```bash
-TOKEN="your-token-here"
-
-curl -X POST http://localhost:8000/api/upload/ \
-  -H "Authorization: Token $TOKEN" \
-  -F "file=@sample_equipment_data.csv"
-```
-
-### Example: Get history
-
-```bash
-curl -H "Authorization: Token $TOKEN" http://localhost:8000/api/history/
-```
-
-### Example: Download PDF
-
-```bash
-curl -H "Authorization: Token $TOKEN" \
-  http://localhost:8000/api/report/?id=1 \
-  --output report.pdf
-```
-
-## Sample CSV Format
-
-The CSV file should have these columns:
-
-```
+```csv
 Equipment Name,Type,Flowrate,Pressure,Temperature
-Pump-1,Pump,120,5.2,110
-Compressor-1,Compressor,95,8.4,95
-...
+Pump-001,Pump,150.5,25.3,45.2
+Reactor-001,Reactor,0,15.8,180.5
 ```
 
-A sample file (`sample_equipment_data.csv`) is included in the project root.
+A sample file (`sample_equipment_data.csv`) is included for testing.
 
-## Features
+## Screenshots
 
-- **Upload CSV** — Upload equipment data CSV files through web or desktop UI
-- **Summary Stats** — View total count, parameter averages, and type distribution
-- **Charts** — Bar chart for type distribution, radar chart for parameter averages
-- **Data Table** — View all equipment rows in a responsive, scrollable table
-- **Upload History** — Browse the last 5 uploads and reload any past dataset
-- **PDF Reports** — Generate and download PDF reports with summary and tables
-- **Dark Mode** — Toggle dark/light theme on web; desktop is dark-only
-- **Authentication** — Token-based auth protects all API endpoints
+### Web Application
 
-## Railway Deployment (Backend)
+![Login Page](./screenshots/login.png)
 
-1. Push the `backend/` folder to a GitHub repository.
+![Register Page](./screenshots/register.png)
 
-2. Create a new project on [Railway](https://railway.app) and connect the repo.
+![Dashboard View](./screenshots/dashboard.png)
 
-3. Set these environment variables in Railway:
-   ```
-   DJANGO_SECRET_KEY=your-random-secret-key
-   DEBUG=0
-   ALLOWED_HOSTS=your-app.railway.app,localhost
-   ```
+![Charts and Analytics](./screenshots/charts.png)
 
-4. Railway will detect the `Procfile` and run gunicorn automatically.
+### Desktop Application
 
-5. After deploy, run migrations via Railway CLI or console:
-   ```bash
-   python manage.py migrate
-   python manage.py createsuperuser
-   python manage.py collectstatic --noinput
-   ```
+![Desktop Login](./screenshots/desktop_login.png)
 
-6. Update `API_BASE` in `web_client/src/App.js` and `desktop_client/app.py` to point to your Railway URL.
+![Desktop Dashboard](./screenshots/desktop_dashboard.png)
 
-## Demo Video Script (2–3 min)
+![Desktop Charts](./screenshots/desktop_charts.png)
 
-1. **Intro (15s)**: Show the project structure in your editor. Briefly mention the tech stack.
-2. **Backend (30s)**: Start the Django server. Show a curl command uploading the sample CSV and getting a summary response.
-3. **Web UI (60s)**: Open the React app. Log in. Upload the sample CSV. Show the summary panel, data table, bar chart, and radar chart. Toggle dark mode. Click a history item to reload a past upload. Download a PDF report.
-4. **Desktop App (45s)**: Launch the PyQt5 app. Log in via the auth dialog. Upload the CSV. Show the table and Matplotlib charts. Download a PDF.
-5. **Wrap-up (15s)**: Mention Railway deployment and summarize the features.
+## Contact
+
+**Developer**: [Your Name]
+
+**Email**: [your.email@example.com]
+
+---
+
+**Thank you for reviewing this submission!**

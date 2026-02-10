@@ -17,8 +17,6 @@ from .serializers import DatasetSerializer
 from .utils import compute_summary, parse_csv_file
 from .tasks import cleanup_old_datasets
 
-
-# register new user, return token
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -28,23 +26,21 @@ class RegisterView(APIView):
         email = request.data.get('email', '').strip()
 
         if not uname or not pwd:
-            return Response({'error': 'Username and password required.'}, status=400)
+            return Response({'error': 'Username and password required'}, status=400)
         if User.objects.filter(username=uname).exists():
-            return Response({'error': 'Username already taken.'}, status=400)
+            return Response({'error': 'Username already taken'}, status=400)
 
         user = User.objects.create_user(username=uname, password=pwd, email=email)
         token, _ = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'username': user.username}, status=201)
 
-
-# upload csv and get summary
 class UploadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         f = request.FILES.get('file')
         if not f:
-            return Response({'error': 'No file provided.'}, status=400)
+            return Response({'error': 'No file provided'}, status=400)
 
         try:
             df = parse_csv_file(f)
@@ -60,8 +56,6 @@ class UploadView(APIView):
         cleanup_old_datasets()
         return Response(DatasetSerializer(ds).data, status=201)
 
-
-# last 5 uploads
 class HistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -69,39 +63,34 @@ class HistoryView(APIView):
         ds = UploadedDataset.objects.all()[:5]
         return Response(DatasetSerializer(ds, many=True).data)
 
-
-# summary for one dataset
 class SummaryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         did = request.query_params.get('id')
         if not did:
-            return Response({'error': 'Missing id.'}, status=400)
+            return Response({'error': 'Missing id'}, status=400)
         try:
             ds = UploadedDataset.objects.get(id=did)
         except UploadedDataset.DoesNotExist:
-            return Response({'error': 'Not found.'}, status=404)
+            return Response({'error': 'Not found'}, status=404)
         return Response(ds.summary)
 
-
-# chart-ready data + rows
 class ChartDataView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         did = request.query_params.get('id')
         if not did:
-            return Response({'error': 'Missing id.'}, status=400)
+            return Response({'error': 'Missing id'}, status=400)
         try:
             ds = UploadedDataset.objects.get(id=did)
         except UploadedDataset.DoesNotExist:
-            return Response({'error': 'Not found.'}, status=404)
+            return Response({'error': 'Not found'}, status=404)
 
         dist = ds.summary.get('type_distribution', {})
         avgs = ds.summary.get('averages', {})
 
-        # read rows for table
         rows = []
         try:
             df = parse_csv_file(ds.csv_file)
@@ -116,26 +105,23 @@ class ChartDataView(APIView):
             'rows': rows,
         })
 
-
-# generate pdf report
 class ReportView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         did = request.query_params.get('id')
         if not did:
-            return Response({'error': 'Missing id.'}, status=400)
+            return Response({'error': 'Missing id'}, status=400)
         try:
             ds = UploadedDataset.objects.get(id=did)
         except UploadedDataset.DoesNotExist:
-            return Response({'error': 'Not found.'}, status=404)
+            return Response({'error': 'Not found'}, status=404)
 
         buf = io.BytesIO()
         doc = SimpleDocTemplate(buf, pagesize=A4)
         styles = getSampleStyleSheet()
         els = []
 
-        # title and info
         els.append(Paragraph("Equipment Data Report", styles['Title']))
         els.append(Spacer(1, 0.3 * inch))
         els.append(Paragraph(f"File: {ds.name}", styles['Normal']))
@@ -144,14 +130,13 @@ class ReportView(APIView):
         els.append(Spacer(1, 0.3 * inch))
 
         tbl_style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b6cb4')),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
             ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('ALIGN', (1, 0), (1, -1), 'CENTER'),
         ])
 
-        # averages table
         avgs = ds.summary.get('averages', {})
         if avgs:
             els.append(Paragraph("Parameter Averages", styles['Heading2']))
@@ -161,7 +146,6 @@ class ReportView(APIView):
             els.append(t)
             els.append(Spacer(1, 0.3 * inch))
 
-        # type distribution table
         dist = ds.summary.get('type_distribution', {})
         if dist:
             els.append(Paragraph("Type Distribution", styles['Heading2']))

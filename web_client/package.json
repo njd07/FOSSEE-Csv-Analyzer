@@ -15,7 +15,8 @@
         "start": "react-scripts start",
         "dev": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test"
+        "test": "react-scripts test",
+        "serve": "serve -s build"
     },
     "browserslist": {
         "production": [

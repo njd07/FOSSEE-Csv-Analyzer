@@ -87,13 +87,17 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    'CORS_ALLOWED_ORIGINS', 
-    'http://localhost:3000,http://127.0.0.1:3000'
-).split(',')
+CORS_ALLOWED_ORIGINS = [
+    o.strip().rstrip('/') for o in os.environ.get(
+        'CORS_ALLOWED_ORIGINS',
+        'http://localhost:3000,http://127.0.0.1:3000'
+    ).split(',') if o.strip()
+]
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000'
-).split(',')
+CSRF_TRUSTED_ORIGINS = [
+    o.strip().rstrip('/') for o in os.environ.get(
+        'CSRF_TRUSTED_ORIGINS',
+        'http://localhost:3000,http://127.0.0.1:3000'
+    ).split(',') if o.strip()
+]

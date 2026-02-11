@@ -1,1 +1,2 @@
-web: python manage.py migrate && DJANGO_SUPERUSER_PASSWORD=njd07 python manage.py createsuperuser --noinput --username admin --email admin@example.com 2>/dev/null || true && gunicorn visualizer_api.wsgi --log-file -
+release: python manage.py migrate --noinput
+web: python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'njd07')" && gunicorn visualizer_api.wsgi --log-file - --bind 0.0.0.0:8080
